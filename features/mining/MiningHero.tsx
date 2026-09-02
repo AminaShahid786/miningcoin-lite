@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Zap, Trophy } from "lucide-react";
 import MiningButton from "@/components/ui/MiningButton";
 import { formatCoin } from "@/utils/format";
 import type { MiningStats } from "@/types/mining";
@@ -14,6 +15,24 @@ const initialStats: MiningStats = {
   levelLabel: "Bronze Miner",
   isMining: false,
 };
+
+function StatPill({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center gap-1.5 rounded-full bg-[var(--color-surface)] border border-white/5 px-3 py-1.5 text-xs">
+      <Icon size={13} className="text-[var(--color-accent)]" />
+      <span className="text-[var(--color-text-muted)]">{label}</span>
+      <span className="font-medium">{value}</span>
+    </div>
+  );
+}
 
 export default function MiningHero() {
   const [stats, setStats] = useState(initialStats);
@@ -40,23 +59,14 @@ export default function MiningHero() {
 
       <MiningButton onTap={handleTap} />
 
-      <div className="flex gap-6 text-sm text-[var(--color-text-muted)]">
-        <span>
-          Rate:{" "}
-          <span className="text-[var(--color-text)]">
-            +{stats.miningRatePerTap} / tap
-          </span>
-        </span>
-        <span>
-          Today:{" "}
-          <span className="text-[var(--color-text)]">
-            {formatCoin(stats.dailyMined)} / {stats.dailyLimit}
-          </span>
-        </span>
-        <span>
-          Level:{" "}
-          <span className="text-[var(--color-accent)]">{stats.levelLabel}</span>
-        </span>
+      <div className="flex flex-wrap justify-center gap-2">
+        <StatPill icon={Zap} label="Rate" value={`+${stats.miningRatePerTap}/tap`} />
+        <StatPill
+          icon={Zap}
+          label="Today"
+          value={`${formatCoin(stats.dailyMined)}/${stats.dailyLimit}`}
+        />
+        <StatPill icon={Trophy} label="Level" value={stats.levelLabel} />
       </div>
     </section>
   );

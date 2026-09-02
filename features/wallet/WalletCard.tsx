@@ -1,13 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Wallet, ArrowDownLeft, ArrowUpRight, Banknote } from "lucide-react";
 import { getWalletStats } from "@/lib/mockWallet";
 import type { WalletStats } from "@/types/wallet";
 import { formatCoin } from "@/utils/format";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import ErrorState from "@/components/ui/ErrorState";
 
-const actions = ["Receive", "Send", "Withdraw"];
+const actions = [
+  { label: "Receive", icon: ArrowDownLeft },
+  { label: "Send", icon: ArrowUpRight },
+  { label: "Withdraw", icon: Banknote },
+];
 
 function StatRow({ label, value }: { label: string; value: string }) {
   return (
@@ -38,9 +43,12 @@ export default function WalletCard() {
   }, []);
 
   return (
-    <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-6 flex flex-col gap-5">
+    <div className="rounded-[var(--radius-lg)] bg-[var(--color-surface)] border border-white/5 p-6 flex flex-col gap-5">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-lg">Wallet</h2>
+        <div className="flex items-center gap-2">
+          <Wallet size={18} className="text-[var(--color-accent)]" />
+          <h2 className="font-semibold text-lg">Wallet</h2>
+        </div>
         {stats && (
           <span
             className={`text-xs px-2 py-1 rounded-full ${
@@ -78,12 +86,13 @@ export default function WalletCard() {
           </div>
 
           <div className="flex gap-2 pt-2">
-            {actions.map((action) => (
+            {actions.map(({ label, icon: Icon }) => (
               <button
-                key={action}
-                className="flex-1 text-sm py-2 rounded-[var(--radius-sm)] border border-[var(--color-accent)]/40 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 transition-colors"
+                key={label}
+                className="flex flex-1 items-center justify-center gap-1.5 text-sm py-2 rounded-[var(--radius-sm)] border border-[var(--color-accent)]/40 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 hover:border-[var(--color-accent)] transition-colors"
               >
-                {action}
+                <Icon size={14} />
+                {label}
               </button>
             ))}
           </div>

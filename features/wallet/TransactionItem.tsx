@@ -1,3 +1,4 @@
+import { ArrowDownLeft, ArrowUpRight, Pickaxe, Banknote } from "lucide-react";
 import type { Transaction } from "@/types/wallet";
 import { formatCoin } from "@/utils/format";
 
@@ -6,6 +7,13 @@ const typeLabels: Record<Transaction["type"], string> = {
   receive: "Received",
   send: "Sent",
   withdraw: "Withdrawal",
+};
+
+const typeIcons: Record<Transaction["type"], React.ElementType> = {
+  mining: Pickaxe,
+  receive: ArrowDownLeft,
+  send: ArrowUpRight,
+  withdraw: Banknote,
 };
 
 const statusStyles: Record<Transaction["status"], string> = {
@@ -25,13 +33,27 @@ function formatTime(iso: string): string {
 }
 
 export default function TransactionItem({ tx }: { tx: Transaction }) {
+  const Icon = typeIcons[tx.type];
+
   return (
-    <div className="flex items-center justify-between rounded-[var(--radius-md)] bg-[var(--color-surface)] px-4 py-3">
-      <div className="flex flex-col">
-        <span className="text-sm font-medium">{typeLabels[tx.type]}</span>
-        <span className="text-xs text-[var(--color-text-muted)]">
-          {formatTime(tx.timestamp)} · {tx.id}
-        </span>
+    <div className="flex items-center justify-between rounded-[var(--radius-md)] bg-[var(--color-surface)] px-4 py-3 transition-colors hover:bg-[var(--color-surface-hover)]">
+      <div className="flex items-center gap-3">
+        <div
+          className={`flex h-9 w-9 items-center justify-center rounded-full ${
+            tx.isPositive
+              ? "bg-[var(--color-success)]/10 text-[var(--color-success)]"
+              : "bg-[var(--color-text-muted)]/10 text-[var(--color-text-muted)]"
+          }`}
+        >
+          <Icon size={16} />
+        </div>
+
+        <div className="flex flex-col">
+          <span className="text-sm font-medium">{typeLabels[tx.type]}</span>
+          <span className="text-xs text-[var(--color-text-muted)]">
+            {formatTime(tx.timestamp)} · {tx.id}
+          </span>
+        </div>
       </div>
 
       <div className="flex flex-col items-end">
