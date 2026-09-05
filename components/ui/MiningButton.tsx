@@ -25,7 +25,6 @@ export default function MiningButton({ onTap }: MiningButtonProps) {
     setShowReward(true);
     onTap();
 
-    // Generate a small burst of particles radiating outward at random angles.
     const newParticles: Particle[] = Array.from({ length: PARTICLE_COUNT }).map(
       () => ({
         id: particleIdRef.current++,

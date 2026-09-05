@@ -14,24 +14,37 @@ export default function TransactionList() {
   const [transactions, setTransactions] = useState<Transaction[] | null>(null);
   const [error, setError] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-
-  async function load() {
-    setError(false);
-    setTransactions(null);
-    try {
-      const data = await getTransactions();
-      setTransactions(data);
-    } catch {
-      setError(true);
-    }
-  }
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
-    load();
-  }, []);
+    // `cancelled` guards against setting state after the component has
+    // unmounted or a newer request has superseded this one.
+    let cancelled = false;
+
+    getTransactions()
+      .then((data) => {
+        if (!cancelled) setTransactions(data);
+      })
+      .catch(() => {
+        if (!cancelled) setError(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadKey]);
+
+  function retry() {
+    // Resetting state here is safe because this runs from a click handler,
+    // not synchronously inside the effect body.
+    setError(false);
+    setTransactions(null);
+    setVisibleCount(PAGE_SIZE);
+    setReloadKey((k) => k + 1);
+  }
 
   if (error) {
-    return <ErrorState message="Couldn't load transactions." onRetry={load} />;
+    return <ErrorState message="Couldn't load transactions." onRetry={retry} />;
   }
 
   if (transactions === null) {
@@ -52,8 +65,8 @@ export default function TransactionList() {
 
   return (
     <div className="flex flex-col gap-2">
-      {visible.map((tx) => (
-        <TransactionItem key={tx.id} tx={tx} />
+      {visible.map((tx, i) => (
+        <TransactionItem key={tx.id} tx={tx} delayMs={i * 60} />
       ))}
 
       {hasMore && (
